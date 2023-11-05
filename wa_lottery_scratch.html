@@ -245,6 +245,11 @@
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function () {
             var resultsElement = document.getElementById("results");
+            if (resultsElement == null)
+            {
+                return;
+            }
+            
             if (this.readyState == 4 && this.status == 200) {
                 var fuckUpFactor = .95;
 
