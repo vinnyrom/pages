@@ -1,5 +1,6 @@
 <html>
 <body style="font-family: 'Courier New', Courier, monospace;">
+    <div id="results" />
     <script type="text/javascript">
         // From https://gist.github.com/adamnovak/f34e6cf2c08684752a9d
         function hyp(successesObserved, sampled, successesAvailable, popSize) {
@@ -244,6 +245,7 @@
 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function () {
+            var resultsElement = document.getElementById("results");
             if (this.readyState == 4 && this.status == 200) {
                 var fuckUpFactor = .95;
 
@@ -382,7 +384,11 @@
                 }
                 results += "</tbody></table>";
 
-                document.getElementById("results").innerHTML = results;
+                resultsElement.innerHTML = results;
+            }
+            else
+            {
+                resultsElement.innerHTML = "<body><p>readyState: " + FormatNumber(this.readyState) + "</p><p>status: " + FormatNumber(this.status) + "</p></body>";
             }
         };
         xmlhttp.open("GET", "https://www.walottery.com/Scratch/Explorer.aspx", true);
@@ -391,6 +397,5 @@
         xmlhttp.setRequestHeader("Expires","0");
         xmlhttp.send();
     </script>
-    <div id="results" />
 </body>
 </html>
