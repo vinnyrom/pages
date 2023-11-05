@@ -243,9 +243,6 @@
         }
 
         var xmlhttp = new XMLHttpRequest();
-        xmlhttp.setRequestHeader("Cache-Control","no-cache, no-store, must-revalidate");
-        xmlhttp.setRequestHeader("Pragma","no-cache");
-        xmlhttp.setRequestHeader("Expires","0");
         xmlhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 var fuckUpFactor = .95;
@@ -389,6 +386,9 @@
             }
         };
         xmlhttp.open("GET", "https://www.walottery.com/Scratch/Explorer.aspx", true);
+        xmlhttp.setRequestHeader("Cache-Control","no-cache, no-store, must-revalidate");
+        xmlhttp.setRequestHeader("Pragma","no-cache");
+        xmlhttp.setRequestHeader("Expires","0");
         xmlhttp.send();
     </script>
     <div id="results" />
