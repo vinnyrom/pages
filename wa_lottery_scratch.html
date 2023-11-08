@@ -392,12 +392,11 @@
             }
             else
             {
-                resultsElement.innerHTML = "<p>readyState: " + FormatNumber(this.readyState) + "</p><p>status: " + FormatNumber(this.status) + "</p>";
+                //resultsElement.innerHTML = "<p>readyState: " + FormatNumber(this.readyState) + "</p><p>status: " + FormatNumber(this.status) + "</p>";
             }
         };
-        xmlhttp.open("GET", "https://www.walottery.com/Scratch/Explorer.aspx", true);
+        xmlhttp.open("GET", "https://www.walottery.com/Scratch/Explorer.aspx?foo=1", true);
         xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xmlhttp.setRequestHeader('Access-Control-Allow-Origin', '*');
         xmlhttp.setRequestHeader("Cache-Control","no-cache, no-store, must-revalidate");
         xmlhttp.setRequestHeader("Pragma","no-cache");
         xmlhttp.setRequestHeader("Expires","0");
