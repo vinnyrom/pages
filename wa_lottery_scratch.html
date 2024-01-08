@@ -323,21 +323,24 @@
                     "<th>Top Prize</th>" +
                     "<th>Probability of<br>Top Prize Remaining</th>" +
                     "<th>Percent Sold<br>Tickets Remaining<br>Adjusted Top Prize Odds</th>" +
-                    "<th>Closes</th>" +
+                    "<th>End of Game<br>End of Sales</th>" +
                     "</tr>";
                 for (game of gamesArray) {
 
+                    var isGameEnding = false;
                     var isGameOver = false;
+                    var endOfGame;
                     var endOfSales;
                     if (!isNaN(game.RedeemEndDate)) {
                         var today = new Date();
                         var endOfRedeem = new Date(game.RedeemEndDate);
-                        var endOfGame = new Date(endOfRedeem.getTime() - (1000 * 60 * 60 * 24 * 180));
+                        endOfGame = new Date(endOfRedeem.getTime() - (1000 * 60 * 60 * 24 * 180));
                         endOfSales = new Date(endOfGame.getTime() + (1000 * 60 * 60 * 24 * 60));
 
                         var salesHaveEnded = endOfSales.getTime() <= today.getTime();
                         if (salesHaveEnded) continue;
 
+                        isGameEnding = true;
                         isGameOver = endOfGame.getTime() <= today.getTime();
                     }
 
@@ -378,11 +381,12 @@
                         results += "<p align=\"right\">1 in " + FormatNumber((game.TicketsRemaining / game.TopPrizesRemaining / game.Probability).toFixed(0)) + "</p>";
                         results += "</td>";
 
-                        results += "<td><p align=\"center\">";
-                        if (isGameOver) {
-                            results += (endOfSales.getMonth() + 1) + "/" + endOfSales.getDate() + "/" + endOfSales.getFullYear();
+                        results += "<td>";
+                        if (isGameEnding) {
+                            results += "<p align=\"center\">" + (endOfGame.getMonth() + 1) + "/" + endOfGame.getDate() + "/" + endOfGame.getFullYear() + "</p>";
+                            results += "<p align=\"center\">" + (endOfSales.getMonth() + 1) + "/" + endOfSales.getDate() + "/" + endOfSales.getFullYear() + "</p>";
                         }
-                        results += "</p></td>";
+                        results += "</td>";
                     }
                     results += "</tr>";
                 }
