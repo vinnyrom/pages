@@ -220,12 +220,22 @@
     <script type="text/javascript">
         function GetPrizeAmount(prize) {
             var prizeAmount = prize.PrizeAmount.replace(/\$|,/g, "");
-            prizeAmount = prizeAmount.replace("LIFE", "1000000");
+            prizeAmount = prizeAmount.replace("LIFE", "1500000");
             var regexAnuity = /(.*)\/yr\/(.*)(years|yrs)/;
             if (prizeAmount.search(regexAnuity) == 0) {
                 var amount = Number(prizeAmount.replace(regexAnuity, "$1"));
                 var duration = Number(prizeAmount.replace(regexAnuity, "$2"));
                 prizeAmount = amount * duration;
+            }
+
+            if (prizeAmount >= 250000)
+            {
+                prizeAmount = prizeAmount / 2;
+            }
+
+            if (prizeAmount >= 600)
+            {
+               prizeAmount = prizeAmount * 0.76; // 24% federal income tax withholding
             }
             return prizeAmount;
         }
@@ -259,6 +269,7 @@
                 for (game of games) {
                     var ticketsPrinted = Number(game.TicketsPrinted.replace(/\$|,/g, ""))
 
+                    var topPrize = 0;
                     var totalTotalPrizes = 0;
                     var totalPrizesRemaining = 0;
                     var totalValueOfPrizesRemaining = 0;
@@ -275,6 +286,11 @@
                             var prizeAmount = GetPrizeAmount(prize);
                             var totalPrizes = Number(prize.TotalPrizes.replace(/\$|,/g, ""));
                             var prizesRemaining = Number(prize.PrizesRemaining.replace(/\$|,/g, ""));
+
+                            if (isTopPrize && prizesRemaining > 0)
+                            {
+                                //prizesRemaining -= 1;
+                            }
 
                             if (!isTopPrize) {
                                 prizesRemaining *= fuckUpFactor;
@@ -309,20 +325,23 @@
                         probabilityOfTopPrizeRemaining = compute(ticketsPrinted, totalTopPrizes, ticketsSold, totalTopPrizes - 1);
                     }
                     var adjustedExpectedValue = (totalValueOfPrizesRemaining - (valueOfTopPrizesRemaining * (1-probabilityOfTopPrizeRemaining))) / costOfTicketsRemaining - 1;
+                    var adjustedTopPrizeOdds = (ticketsRemaining / topPrizesRemaining / probabilityOfTopPrizeRemaining).toFixed(0);
+                    var test = (adjustedTopPrizeOdds * game.Cost / 100).toFixed(0);
+                    var test2 = (1 + expectedValue) * topPrize / test;
 
-                    var gameObject = { Id: game.Id, Name: game.GameName, Cost: game.Cost, ExpectedValue: expectedValue, AdjustedExpectedValue: adjustedExpectedValue, ExpectedValueWithoutTopPrizes: expectedValueWithoutTopPrizes, RedeemEndDate: new Date(game.RedeemEndDate), Image: game.UnscratchedImageUrl, TopPrize: topPrize, TopPrizesRemaining: topPrizesRemaining, PercentSold: percentSold, TicketsRemaining: ticketsRemaining, Probability: probabilityOfTopPrizeRemaining};
+                    var gameObject = { Id: game.Id, Name: game.GameName, Cost: game.Cost, ExpectedValue: expectedValue, AdjustedExpectedValue: adjustedExpectedValue, ExpectedValueWithoutTopPrizes: expectedValueWithoutTopPrizes, RedeemEndDate: new Date(game.RedeemEndDate), Image: game.UnscratchedImageUrl, TopPrize: topPrize, TopPrizesRemaining: topPrizesRemaining, PercentSold: percentSold, TicketsRemaining: ticketsRemaining, Probability: probabilityOfTopPrizeRemaining, AdjustedTopPrizeOdds: adjustedTopPrizeOdds, Test: test, Test2: test2};
                     gamesArray.push(gameObject);
                 }
 
-                gamesArray.sort(function (lhs, rhs) { return rhs.AdjustedExpectedValue - lhs.AdjustedExpectedValue });
+                gamesArray.sort(function (lhs, rhs) { return rhs.Test2 - lhs.Test2 });
                 var results =
                     "<table border=\"all\"><tbody><tr>" +
                     "<th>Game</th>" +
                     "<th>Cost</th>" +
                     "<th>EV<br>[Adjusted]<br>(Without Top Prizes)</th>" +
-                    "<th>Top Prize</th>" +
+                    "<th>Top Prize<br>(Remaining)</th>" +
                     "<th>Probability of<br>Top Prize Remaining</th>" +
-                    "<th>Percent Sold<br>Tickets Remaining<br>Adjusted Top Prize Odds</th>" +
+                    "<th>Percent Sold<br>Tickets Remaining<br>Adjusted Top Prize Odds<br>Odds Per $100<br>Bang for Buck Factor</th>" +
                     "<th>End of Game<br>End of Sales</th>" +
                     "</tr>";
                 for (game of gamesArray) {
@@ -378,7 +397,9 @@
                         results += "<td>";
                         results += "<p align=\"right\">" + FormatPercent(game.PercentSold) + "</p>";
                         results += "<p align=\"right\">" + FormatNumber(game.TicketsRemaining) + "</p>";
-                        results += "<p align=\"right\">1 in " + FormatNumber((game.TicketsRemaining / game.TopPrizesRemaining / game.Probability).toFixed(0)) + "</p>";
+                        results += "<p align=\"right\">1 in " + FormatNumber(game.AdjustedTopPrizeOdds) + "</p>";
+                        results += "<p align=\"right\">1 in " + FormatNumber(game.Test) + "</p>";
+                        results += "<p align=\"right\">" + FormatNumber(game.Test2) + "</p>";
                         results += "</td>";
 
                         results += "<td>";
